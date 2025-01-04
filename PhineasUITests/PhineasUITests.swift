@@ -2,7 +2,6 @@
 //  PhineasUITests.swift
 //  PhineasUITests
 //
-//  Created by Sriram Kiron on 1/4/25.
 //
 
 import XCTest
