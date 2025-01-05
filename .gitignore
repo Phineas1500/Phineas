@@ -1,1 +1,2 @@
-Phineas.xcodeproj
+*.xcodeproj/
+Info.plist
