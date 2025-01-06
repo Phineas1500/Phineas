@@ -13,8 +13,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if authManager.isAuthenticated {
-                HomeView()
-                    .environmentObject(authManager)
+                HomeView(authManager: authManager)  // Changed this line to pass authManager directly
             } else {
                 LoginView()
                     .environmentObject(authManager)
