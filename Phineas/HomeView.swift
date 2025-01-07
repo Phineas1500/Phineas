@@ -8,8 +8,6 @@ import SwiftUICore
 import SwiftUI
 import GoogleAPIClientForREST_Calendar
 
-
-
 struct HomeView: View {
     @ObservedObject var authManager: AuthenticationManager
     @StateObject private var calendarManager = CalendarManager()
@@ -54,6 +52,15 @@ struct HomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if authManager.hasCalendarAccess {
+                    print("HomeView appeared, loading events...")
+                    loadEvents()
+                } else {
+                    print("No calendar access when HomeView appeared")
+                }
+            }
+            .onChange(of: authManager.hasCalendarAccess) { newValue in
+                if newValue {
+                    print("Calendar access granted, loading events...")
                     loadEvents()
                 }
             }
@@ -62,12 +69,23 @@ struct HomeView: View {
     
     private func loadEvents() {
         isLoading = true
+        errorMessage = nil // Clear any previous errors
+        
+        // Reinitialize the calendar service
+        calendarManager.reinitializeService()
+        
         calendarManager.fetchUpcomingEvents { result in
             isLoading = false
             switch result {
             case .success(let fetchedEvents):
+                if fetchedEvents.isEmpty {
+                    print("No events found in calendar")
+                } else {
+                    print("Found \(fetchedEvents.count) events")
+                }
                 events = fetchedEvents
             case .failure(let error):
+                print("Error fetching events: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription
             }
         }

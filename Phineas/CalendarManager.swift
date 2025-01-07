@@ -16,11 +16,19 @@ class CalendarManager: ObservableObject {
     }
     
     private func setupService() {
-        guard let user = GIDSignIn.sharedInstance.currentUser else { return }
+        guard let user = GIDSignIn.sharedInstance.currentUser else {
+            print("No user found when setting up calendar service")
+            return
+        }
         
         let service = GTLRCalendarService()
         service.authorizer = user.fetcherAuthorizer
         self.service = service
+        print("Calendar service setup completed")
+    }
+    
+    func reinitializeService() {
+        setupService()
     }
     
     func fetchUpcomingEvents(completion: @escaping (Result<[GTLRCalendar_Event], Error>) -> Void) {
