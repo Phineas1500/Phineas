@@ -19,11 +19,15 @@ struct LoginView: View {
             Spacer()
             
             // Logo
-            Image(systemName: "bear.fill")
+            Image("PhineasAppIcon")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
-                .foregroundColor(Color(red: 0.4, green: 0.6, blue: 0.8))
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 24)
+                        .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                )
             
             // Welcome Text
             VStack(spacing: 10) {

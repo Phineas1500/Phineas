@@ -58,7 +58,7 @@ struct HomeView: View {
                     print("No calendar access when HomeView appeared")
                 }
             }
-            .onChange(of: authManager.hasCalendarAccess) { newValue in
+            .onChange(of: authManager.hasCalendarAccess) { oldValue, newValue in
                 if newValue {
                     print("Calendar access granted, loading events...")
                     loadEvents()

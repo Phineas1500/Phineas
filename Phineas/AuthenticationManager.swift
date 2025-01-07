@@ -37,7 +37,8 @@ class AuthenticationManager: ObservableObject {
             return
         }
         
-        let config = GIDConfiguration(clientID: clientID)
+        // changed config to _
+        _ = GIDConfiguration(clientID: clientID)
         
         GIDSignIn.sharedInstance.signIn(
             withPresenting: rootViewController,
@@ -49,7 +50,8 @@ class AuthenticationManager: ObservableObject {
                 return
             }
             
-            guard let result = signInResult else {
+            // changed let result = signInResult to signInResult != nil
+            guard signInResult != nil else {
                 print("No result from sign in")
                 return
             }
