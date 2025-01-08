@@ -11,9 +11,11 @@ import GoogleAPIClientForREST_Calendar
 struct HomeView: View {
     @ObservedObject var authManager: AuthenticationManager
     @StateObject private var calendarManager = CalendarManager()
+    @StateObject private var preferencesManager = UserPreferencesManager()
     @State private var events: [GTLRCalendar_Event] = []
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showingSettings = false
     
     private let backgroundColor = Color(red: 231/255, green: 215/255, blue: 171/255)
     private let darkerColor = Color(red: 221/255, green: 205/255, blue: 161/255)
@@ -50,6 +52,30 @@ struct HomeView: View {
                 .ignoresSafeArea()
             )
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingSettings = true
+                    }) {
+                        Image(systemName: "gear")
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                ToolbarItem(placement: .principal) {
+                    Text("Phineas")
+                        .font(.headline)
+                }
+            }
+            .sheet(isPresented: $showingSettings) {
+                NavigationView {
+                    SettingsView()
+                        .environmentObject(NotificationManager.shared)
+                        .navigationBarItems(trailing: Button("Done") {
+                            showingSettings = false
+                        })
+                }
+            }
             .onAppear {
                 if authManager.hasCalendarAccess {
                     print("HomeView appeared, loading events...")
@@ -69,9 +95,8 @@ struct HomeView: View {
     
     private func loadEvents() {
         isLoading = true
-        errorMessage = nil // Clear any previous errors
+        errorMessage = nil
         
-        // Reinitialize the calendar service
         calendarManager.reinitializeService()
         
         calendarManager.fetchUpcomingEvents { result in
@@ -84,6 +109,16 @@ struct HomeView: View {
                     print("Found \(fetchedEvents.count) events")
                 }
                 events = fetchedEvents
+                
+                // Schedule notifications for each event
+                for event in fetchedEvents {
+                    if let eventDate = event.start?.dateTime?.date {
+                        print("Scheduling notification for event: \(event.summary ?? "Untitled") at \(eventDate)")
+                        // For now, setting all events to medium urgency
+                        // In the future, this would be determined by the LLM
+                        NotificationManager.shared.scheduleEventNotification(for: event, urgencyLevel: .medium)
+                    }
+                }
             case .failure(let error):
                 print("Error fetching events: \(error.localizedDescription)")
                 errorMessage = error.localizedDescription

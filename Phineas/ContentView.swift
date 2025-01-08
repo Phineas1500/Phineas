@@ -9,11 +9,13 @@ import GoogleSignInSwift
 
 struct ContentView: View {
     @StateObject private var authManager = AuthenticationManager()
+    @StateObject private var notificationManager = NotificationManager.shared
     
     var body: some View {
         Group {
             if authManager.isAuthenticated {
-                HomeView(authManager: authManager)  // Changed this line to pass authManager directly
+                HomeView(authManager: authManager)
+                    .environmentObject(notificationManager)
             } else {
                 LoginView()
                     .environmentObject(authManager)
